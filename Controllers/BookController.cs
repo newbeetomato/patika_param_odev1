@@ -37,53 +37,61 @@ namespace WebApi.AddControllers
         public List<Book> GetBooks([FromQuery] string? ShortType) //Get işlemi
         {
 
-            
-                List<Book> bookList;
-                bookList = BookList.ToList<Book>();
-                if (ShortType is not null)
+
+            List<Book> bookList;
+            bookList = BookList.ToList<Book>();
+            if (ShortType is not null)
+            {
+
+                if (ShortType == "a-z")//A dan Z ye listeleme işlemi
                 {
-
-                    if (ShortType == "a-z")//A dan Z ye listeleme işlemi
-                    {
-                        bookList = BookList.OrderBy(x => x.Title).ToList<Book>();
-                        return bookList;
-
-                    }
-                    if (ShortType == "z-a")//Z den A ye listeleme işlemi
-                    {
-
-                        bookList = BookList.OrderByDescending(x => x.Title).ToList<Book>();
-                        return bookList;
-                    }
-
+                    bookList = BookList.OrderBy(x => x.Title).ToList<Book>();
+                    return bookList;
 
                 }
-                return bookList;
-           
-            
+                if (ShortType == "z-a")//Z den A ye listeleme işlemi
+                {
+
+                    bookList = BookList.OrderByDescending(x => x.Title).ToList<Book>();
+                    return bookList;
+                }
+
+
+            }
+            return bookList;
+
 
 
 
         }
 
         [HttpGet("{id}")]
-        public Book GetById([FromRoute] int id) //from route id ile get işlemi
+        public IActionResult GetById([FromRoute] int id) //from route id ile get işlemi
         {
 
-            
-                var book = BookList.Where(book => book.Id == id).SingleOrDefault();//highorder
+            try
+            {
+                var book = BookList.Where(x => x.Id == id).SingleOrDefault();//highorder
                 if (book == null)
                 {
-                    return BookList.First();
+                    return NotFound();
                 }
-                return book;
-           
-           
-            
+                return Ok(book);
+            }
+            catch (Exception)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+
+
+
+
+
         }
 
         [HttpPost]
-        public IActionResult AddBook([FromBody] Book newBook) 
+        public IActionResult AddBook([FromBody] Book newBook)
         {
 
             try
@@ -102,11 +110,11 @@ namespace WebApi.AddControllers
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
             }
-            
+
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateBook( int id, [FromBody] Book updatedBook) //İd ye göre değişitirlen kısımları Update 
+        public IActionResult UpdateBook(int id, [FromBody] Book updatedBook) //İd ye göre değişitirlen kısımları Update 
         {
             try
             {
@@ -120,7 +128,7 @@ namespace WebApi.AddControllers
                 book.PublishDate = updatedBook.PublishDate != default ? updatedBook.PublishDate : book.PublishDate;
                 book.Title = updatedBook.Title != default ? updatedBook.Title : book.Title;
 
-                return Ok(); //200
+                return Ok(book); //200
             }
             catch (Exception)
             {
@@ -128,12 +136,22 @@ namespace WebApi.AddControllers
                 return StatusCode(StatusCodes.Status500InternalServerError);
 
             }
-            
+
 
         }
 
+/* patch için aşşagıdaki yolla title değerini istediğimiz value ile update edebilirz
+          [
+            {
+             "value":"yeni değer",
+             "path":"Title",
+             "op":"replace"
+            }
+            ]
+         */
         [HttpPatch("{id}")]
-        public IActionResult UpdateBookPatch( int id, [FromBody] JsonPatchDocument<Book> updatedBookPatch)
+        
+        public IActionResult UpdateBookPatch(int id, [FromBody] JsonPatchDocument<Book> updatedBookPatch)
         {
             try
             {
@@ -148,7 +166,7 @@ namespace WebApi.AddControllers
 
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
-            
+
 
 
         }
