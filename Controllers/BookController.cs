@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 
@@ -72,15 +73,6 @@ namespace WebApi.AddControllers
             return book;
         }
 
-
-        /*[HttpGet("{i}")]
-        public Book Get([FromQuery] string id)
-        {
-            var book = BookList.Where(book=>book.Id== Convert.ToInt32(id)).SingleOrDefault();
-            return book;
-        }
-        iki get aynı yerde olmuyormuş*/
-
         [HttpPost]
         public IActionResult AddBook([FromBody] Book newBook)
         {
@@ -92,8 +84,9 @@ namespace WebApi.AddControllers
 
             return Created("201", newBook);
         }
+
         [HttpPut("{id}")]
-        public IActionResult UpdateBook(int id, [FromBody] Book updatedBook)
+        public IActionResult UpdateBook( int id, [FromBody] Book updatedBook)
         {
             var book = BookList.SingleOrDefault(x => x.Id == id);
             if (book == null)
@@ -108,6 +101,20 @@ namespace WebApi.AddControllers
             return Ok();
 
         }
+
+        [HttpPatch("{id}")]
+        public IActionResult UpdateBookPatch( int id, [FromBody] JsonPatchDocument<Book> updatedBookPatch)
+        {
+            var book=BookList.SingleOrDefault(x=>x.Id==id);
+            if(book!=null)
+             {return NotFound(); }
+            updatedBookPatch.ApplyTo(book,ModelState);
+            return Ok(book);
+
+
+        }
+
+
         [HttpDelete("{id}")]
         public IActionResult DeleteBook(int id)
         {
