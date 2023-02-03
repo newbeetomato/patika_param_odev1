@@ -37,28 +37,37 @@ namespace WebApi.AddControllers
         public IActionResult GetBooks([FromQuery] string? ShortType) //Get işlemi
         {
 
-
-            List<Book> bookList;
-            bookList = BookList.ToList<Book>();
-            if (ShortType is not null)
+            try
             {
-
-                if (ShortType == "a-z")//A dan Z ye listeleme işlemi
-                {
-                    bookList = BookList.OrderBy(x => x.Title).ToList<Book>();
-                    return Ok(bookList);
-
-                }
-                if (ShortType == "z-a")//Z den A ye listeleme işlemi
+                List<Book> bookList;
+                bookList = BookList.ToList<Book>();
+                if (ShortType is not null)
                 {
 
-                    bookList = BookList.OrderByDescending(x => x.Title).ToList<Book>();
-                    return Ok(bookList);
+                    if (ShortType == "a-z")//A dan Z ye listeleme işlemi
+                    {
+                        bookList = BookList.OrderBy(x => x.Title).ToList<Book>();
+                        return Ok(bookList);
+
+                    }
+                    if (ShortType == "z-a")//Z den A ye listeleme işlemi
+                    {
+
+                        bookList = BookList.OrderByDescending(x => x.Title).ToList<Book>();
+                        return Ok(bookList);
+                    }
+                    return BadRequest();
+
                 }
-                return BadRequest();
+                return Ok(bookList);
 
             }
-            return Ok(bookList);
+            catch (Exception)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError);
+
+            }
 
 
 
