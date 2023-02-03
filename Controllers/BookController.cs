@@ -34,7 +34,7 @@ namespace WebApi.AddControllers
         };
 
         [HttpGet]
-        public List<Book> GetBooks([FromQuery] string? ShortType) //Get işlemi
+        public IActionResult GetBooks([FromQuery] string? ShortType) //Get işlemi
         {
 
 
@@ -46,19 +46,19 @@ namespace WebApi.AddControllers
                 if (ShortType == "a-z")//A dan Z ye listeleme işlemi
                 {
                     bookList = BookList.OrderBy(x => x.Title).ToList<Book>();
-                    return bookList;
+                    return Ok(bookList);
 
                 }
                 if (ShortType == "z-a")//Z den A ye listeleme işlemi
                 {
 
                     bookList = BookList.OrderByDescending(x => x.Title).ToList<Book>();
-                    return bookList;
+                    return Ok(bookList);
                 }
-
+                return BadRequest();
 
             }
-            return bookList;
+            return Ok(bookList);
 
 
 
@@ -149,7 +149,7 @@ namespace WebApi.AddControllers
             }
             ]
          */
-        [HttpPatch("{id}")]
+        [HttpPatch("{id}")] 
         
         public IActionResult UpdateBookPatch(int id, [FromBody] JsonPatchDocument<Book> updatedBookPatch)
         {
@@ -173,7 +173,7 @@ namespace WebApi.AddControllers
 
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteBook(int id)
+        public IActionResult DeleteBook(int id) 
         {
             try
             {
