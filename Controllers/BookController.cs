@@ -8,7 +8,7 @@ namespace WebApi.AddControllers
     [Route("[controller]s")]
     public class BookController : ControllerBase
     {
-        private static List<Book> BookList = new List<Book>()
+        private static List<Book> BookList = new List<Book>() //static oluşturulan kitaplar
         {
                 new Book{
                     Id=1,
@@ -34,20 +34,20 @@ namespace WebApi.AddControllers
         };
 
         [HttpGet]
-        public List<Book> GetBooks([FromQuery] string? ShortType)
+        public List<Book> GetBooks([FromQuery] string? ShortType) //Get işlemi
         {
             List<Book> bookList;
             bookList = BookList.ToList<Book>();
             if (ShortType is not null)
             {
 
-                if (ShortType == "a-z")
+                if (ShortType == "a-z")//A dan Z ye listeleme işlemi
                 {
                     bookList = BookList.OrderBy(x => x.Title).ToList<Book>();
                     return bookList;
 
                 }
-                if (ShortType == "z-a")
+                if (ShortType == "z-a")//Z den A ye listeleme işlemi
                 {
 
                     bookList = BookList.OrderByDescending(x => x.Title).ToList<Book>();
@@ -63,9 +63,9 @@ namespace WebApi.AddControllers
         }
 
         [HttpGet("{id}")]
-        public Book GetById([FromRoute] int id) 
+        public Book GetById([FromRoute] int id) //from route id ile get işlemi
         {
-            var book = BookList.Where(book => book.Id == id).SingleOrDefault();
+            var book = BookList.Where(book => book.Id == id).SingleOrDefault();//highorder
             if (book == null)
             {
                 return BookList.First();
@@ -74,7 +74,7 @@ namespace WebApi.AddControllers
         }
 
         [HttpPost]
-        public IActionResult AddBook([FromBody] Book newBook)
+        public IActionResult AddBook([FromBody] Book newBook) 
         {
             var book = BookList.SingleOrDefault(x => x.Title == newBook.Title);
             if (book != null)
@@ -82,23 +82,23 @@ namespace WebApi.AddControllers
 
             BookList.Add(newBook);
 
-            return Created("201", newBook);
+            return Created("201", newBook); // 201 kodu
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateBook( int id, [FromBody] Book updatedBook)
+        public IActionResult UpdateBook( int id, [FromBody] Book updatedBook) //İd ye göre değişitirlen kısımları Update 
         {
             var book = BookList.SingleOrDefault(x => x.Id == id);
             if (book == null)
-                return NotFound();
+                return NotFound(); // 404 kodu
 
             book.GenereId = updatedBook.GenereId != default ? updatedBook.GenereId : book.GenereId;
-            
+            // verisi varsa genreid yi update et yoksa kendi değerini kullan
             book.PageCount = updatedBook.PageCount != default ? updatedBook.PageCount : book.PageCount;
             book.PublishDate = updatedBook.PublishDate != default ? updatedBook.PublishDate : book.PublishDate;
             book.Title = updatedBook.Title != default ? updatedBook.Title : book.Title;
 
-            return Ok();
+            return Ok(); //200
 
         }
 
@@ -120,10 +120,10 @@ namespace WebApi.AddControllers
         {
             var book = BookList.SingleOrDefault(x => x.Id == id);
             if (book == null)
-                return BadRequest();
+                return BadRequest(); // 400 Http durum kodu
 
             BookList.Remove(book);
-            return Ok();
+            return Ok(); //200 durum kodu
         }
     }
 }
