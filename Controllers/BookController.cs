@@ -63,9 +63,9 @@ namespace WebApi.AddControllers
         }
 
         [HttpGet("{id}")]
-        public Book GetById([FromRoute] int id) //from route
+        public Book GetById([FromRoute] int id) 
         {
-            var book = BookList.Where(book => book.Id == id).SingleOrDefault();//highorder
+            var book = BookList.Where(book => book.Id == id).SingleOrDefault();
             if (book == null)
             {
                 return BookList.First();
@@ -93,7 +93,7 @@ namespace WebApi.AddControllers
                 return NotFound();
 
             book.GenereId = updatedBook.GenereId != default ? updatedBook.GenereId : book.GenereId;
-            // verisi varsa genreid yi update et yoksa kendi değerini kullan
+            
             book.PageCount = updatedBook.PageCount != default ? updatedBook.PageCount : book.PageCount;
             book.PublishDate = updatedBook.PublishDate != default ? updatedBook.PublishDate : book.PublishDate;
             book.Title = updatedBook.Title != default ? updatedBook.Title : book.Title;
