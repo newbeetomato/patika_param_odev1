@@ -34,23 +34,23 @@ namespace WebApi.AddControllers
         };
 
         [HttpGet]
-        public List<Book> GetBooks([FromQuery] string? SortType)
+        public List<Book> GetBooks([FromQuery] string? ShortType)
         {
             List<Book> bookList;
             bookList = BookList.ToList<Book>();
-            if (SortType is not null)
+            if (ShortType is not null)
             {
 
-                if (SortType == "a-z")
+                if (ShortType == "a-z")
                 {
-                    bookList = BookList.OrderBy(x => x.Id).ToList<Book>();
+                    bookList = BookList.OrderBy(x => x.Title).ToList<Book>();
                     return bookList;
 
                 }
-                if (SortType == "z-a")
+                if (ShortType == "z-a")
                 {
 
-                    bookList = BookList.OrderByDescending(x => x.Id).ToList<Book>();
+                    bookList = BookList.OrderByDescending(x => x.Title).ToList<Book>();
                     return bookList;
                 }
 
@@ -106,7 +106,7 @@ namespace WebApi.AddControllers
         public IActionResult UpdateBookPatch( int id, [FromBody] JsonPatchDocument<Book> updatedBookPatch)
         {
             var book=BookList.SingleOrDefault(x=>x.Id==id);
-            if(book!=null)
+            if(book==null)
              {return NotFound(); }
             updatedBookPatch.ApplyTo(book,ModelState);
             return Ok(book);
