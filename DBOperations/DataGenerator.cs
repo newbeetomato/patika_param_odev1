@@ -1,6 +1,5 @@
 
-/*using Microsoft.EntityFrameworkCore;
-
+using Microsoft.EntityFrameworkCore;
 namespace WebApi.DBOperations
 {
     public class DataGenerator
@@ -9,7 +8,7 @@ namespace WebApi.DBOperations
         {
             using (var context = new BookStoreDbContext(serviceProvider.GetRequiredService<DbContextOptions<BookStoreDbContext>>()))
             {
-                if (context.Books.Any())
+                if (context.Books.Any())//hiç veri yoksa dön
                 {
                     return;
                 }
@@ -44,4 +43,4 @@ namespace WebApi.DBOperations
             }
         }
     }
-}*/
+}

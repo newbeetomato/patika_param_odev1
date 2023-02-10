@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
+using WebApi.DBOperations;
 
 namespace WebApi.AddControllers
 {
@@ -8,30 +9,12 @@ namespace WebApi.AddControllers
     [Route("[controller]s")]
     public class BookController : ControllerBase
     {
-        private static List<Book> BookList = new List<Book>() //static oluşturulan kitaplar
+        private readonly BookStoreDbContext _context;
+
+        public BookController (BookStoreDbContext context)
         {
-                new Book{
-                    Id=1,
-                    Title="Lean Startup",
-                    GenereId=1, //kişisel gelişim personal growth
-                    PageCount=200,
-                    PublishDate=new DateTime(2001,06,12)
-                },
-                new Book{
-                    Id=2,
-                    Title="Herland",
-                    GenereId=2,
-                    PageCount=200,
-                    PublishDate=new DateTime(2012,08,08)
-                },
-                new Book{
-                    Id=3,
-                    Title="Dune",
-                    GenereId=2,//science fiction
-                    PageCount=200,
-                    PublishDate=new DateTime(2023,12,12)
-                }
-        };
+            _context = context;
+        }
 
         [HttpGet]
         public IActionResult GetBooks([FromQuery] string? ShortType) //Get işlemi
@@ -40,20 +23,20 @@ namespace WebApi.AddControllers
             try
             {
                 List<Book> bookList;
-                bookList = BookList.ToList<Book>();
+                bookList = _context.Books.ToList<Book>();
                 if (ShortType is not null)
                 {
 
                     if (ShortType == "a-z")//A dan Z ye listeleme işlemi
                     {
-                        bookList = BookList.OrderBy(x => x.Title).ToList<Book>();
+                        bookList = _context.Books.OrderBy(x => x.Title).ToList<Book>();
                         return Ok(bookList);
 
                     }
                     if (ShortType == "z-a")//Z den A ye listeleme işlemi
                     {
 
-                        bookList = BookList.OrderByDescending(x => x.Title).ToList<Book>();
+                        bookList = _context.Books.OrderByDescending(x => x.Title).ToList<Book>();
                         return Ok(bookList);
                     }
                     return BadRequest();
@@ -80,7 +63,7 @@ namespace WebApi.AddControllers
 
             try
             {
-                var book = BookList.Where(x => x.Id == id).SingleOrDefault();//highorder
+                var book = _context.Books.Where(x => x.Id == id).SingleOrDefault();//highorder
                 if (book == null)
                 {
                     return NotFound();
@@ -105,11 +88,13 @@ namespace WebApi.AddControllers
 
             try
             {
-                var book = BookList.SingleOrDefault(x => x.Title == newBook.Title);
+                var book = _context.Books.SingleOrDefault(x => x.Title == newBook.Title);
                 if (book != null)
                     return BadRequest();
 
-                BookList.Add(newBook);
+                _context.Books.Add(newBook);
+                _context.SaveChanges();
+
 
                 return Created("201", newBook); // 201 kodu
             }
@@ -127,7 +112,7 @@ namespace WebApi.AddControllers
         {
             try
             {
-                var book = BookList.SingleOrDefault(x => x.Id == id);
+                var book = _context.Books.SingleOrDefault(x => x.Id == id);
                 if (book == null)
                     return NotFound(); // 404 kodu
 
@@ -136,6 +121,7 @@ namespace WebApi.AddControllers
                 book.PageCount = updatedBook.PageCount != default ? updatedBook.PageCount : book.PageCount;
                 book.PublishDate = updatedBook.PublishDate != default ? updatedBook.PublishDate : book.PublishDate;
                 book.Title = updatedBook.Title != default ? updatedBook.Title : book.Title;
+                _context.SaveChanges();
 
                 return Ok(book); //200
             }
@@ -149,7 +135,7 @@ namespace WebApi.AddControllers
 
         }
 
-/* patch için aşşagıdaki yolla title değerini istediğimiz value ile update edebilirz
+        /* patch için aşşagıdaki yolla title değerini istediğimiz value ile update edebilirz
           [
             {
              "value":"yeni değer",
@@ -164,10 +150,12 @@ namespace WebApi.AddControllers
         {
             try
             {
-                var book = BookList.SingleOrDefault(x => x.Id == id);
+                var book = _context.Books.SingleOrDefault(x => x.Id == id);
                 if (book == null)
                 { return NotFound(); }
                 updatedBookPatch.ApplyTo(book, ModelState);
+                _context.SaveChanges();
+
                 return Ok(book);
             }
             catch (Exception)
@@ -186,11 +174,13 @@ namespace WebApi.AddControllers
         {
             try
             {
-                var book = BookList.SingleOrDefault(x => x.Id == id);
+                var book = _context.Books.SingleOrDefault(x => x.Id == id);
                 if (book == null)
                     return BadRequest(); // 400 Http durum kodu
 
-                BookList.Remove(book);
+                _context.Books.Remove(book);
+                _context.SaveChanges();
+
                 return Ok(); //200 durum kodu
             }
             catch (Exception)

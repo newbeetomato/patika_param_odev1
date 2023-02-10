@@ -1,4 +1,5 @@
-/*using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace WebApi.DBOperations
 {
@@ -10,4 +11,4 @@ namespace WebApi.DBOperations
         }
         public DbSet<Book> Books { get; set; }
     }
-}*/
+}
